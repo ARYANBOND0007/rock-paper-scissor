@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Tournament</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-title {
+            font-size: 3rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.2); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 30px rgba(255,255,255,0.4); }
+        }
+
+        .mode-selection {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .mode-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .game-area {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .score-item {
+            text-align: center;
+            color: white;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .round-indicator {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .battle-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 40px 0;
+            min-height: 200px;
+        }
+
+        .player-section {
+            text-align: center;
+            flex: 1;
+        }
+
+        .player-name {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .choice-display {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .vs-text {
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .choice-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .choice-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            background: linear-gradient(45deg, #4ecdc4, #26a69a);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .choice-btn:active {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .result-display {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .countdown {
+            font-size: 3rem;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: countdown-pulse 1s ease-in-out;
+        }
+
+        @keyframes countdown-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .final-result {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .final-result h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .final-result p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .play-again-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .play-again-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .winning {
+            animation: victory-glow 0.5s ease-in-out;
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6) !important;
+        }
+
+        .losing {
+            animation: defeat-shake 0.5s ease-in-out;
+            border-color: #f44336 !important;
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.6) !important;
+        }
+
+        @keyframes victory-glow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes defeat-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .player-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            font-size: 1rem;
+            margin: 10px 0;
+            width: 200px;
+        }
+
+        .player-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        @media (max-width: 600px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .battle-area {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .vs-text {
+                order: 1;
+            }
+            
+            .choice-display {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+            
+            .choice-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1 class="game-title">🎮 Rock Paper Scissors 🎮</h1>
+            <p style="color: white; font-size: 1.2rem; opacity: 0.9;">Tournament Mode - First to 3 wins!</p>
+        </div>
+
+        <div class="mode-selection" id="modeSelection">
+            <h2 style="color: white; text-align: center; margin-bottom: 20px;">Choose Game Mode</h2>
+            <div class="mode-buttons">
+                <button class="mode-btn" onclick="startGame('computer')">🤖 vs Computer</button>
+                <button class="mode-btn" onclick="startGame('player')">👥 vs Player</button>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-label" id="player1Label">Player 1</div>
+                    <div class="score-value" id="player1Score">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Round</div>
+                    <div class="score-value" id="currentRound">1</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label" id="player2Label">Computer</div>
+                    <div class="score-value" id="player2Score">0</div>
+                </div>
+            </div>
+
+            <div class="battle-area">
+                <div class="player-section">
+                    <div class="player-name" id="player1Name">Player 1</div>
+                    <div class="choice-display" id="player1Choice">❓</div>
+                </div>
+                <div class="vs-text">VS</div>
+                <div class="player-section">
+                    <div class="player-name" id="player2Name">Computer</div>
+                    <div class="choice-display" id="player2Choice">❓</div>
+                </div>
+            </div>
+
+            <div class="choice-buttons" id="choiceButtons">
+                <button class="choice-btn" onclick="makeChoice('rock')">🪨</button>
+                <button class="choice-btn" onclick="makeChoice('paper')">📄</button>
+                <button class="choice-btn" onclick="makeChoice('scissors')">✂️</button>
+            </div>
+
+            <div class="result-display" id="resultDisplay">Make your choice!</div>
+
+            <div class="final-result hidden" id="finalResult">
+                <h2 id="finalWinner"></h2>
+                <p id="finalScore"></p>
+                <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameMode = '';
+        let currentRound = 1;
+        let player1Score = 0;
+        let player2Score = 0;
+        let player1Name = 'Player 1';
+        let player2Name = 'Computer';
+        let waitingForPlayer2 = false;
+        let player1Choice = '';
+        let player2Choice = '';
+
+        const choices = {
+            rock: '🪨',
+            paper: '📄',
+            scissors: '✂️'
+        };
+
+        function startGame(mode) {
+            gameMode = mode;
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            
+            if (mode === 'player') {
+                player1Name = prompt('Enter Player 1 name:') || 'Player 1';
+                player2Name = prompt('Enter Player 2 name:') || 'Player 2';
+                document.getElementById('player1Label').textContent = player1Name;
+                document.getElementById('player2Label').textContent = player2Name;
+                document.getElementById('player1Name').textContent = player1Name;
+                document.getElementById('player2Name').textContent = player2Name;
+            }
+            
+            resetRound();
+        }
+
+        function makeChoice(choice) {
+            if (gameMode === 'computer') {
+                player1Choice = choice;
+                player2Choice = getComputerChoice();
+                showChoices();
+                setTimeout(() => {
+                    determineWinner();
+                }, 1000);
+            } else {
+                if (!waitingForPlayer2) {
+                    player1Choice = choice;
+                    waitingForPlayer2 = true;
+                    document.getElementById('player1Choice').textContent = choices[choice];
+                    document.getElementById('resultDisplay').innerHTML = `${player2Name}, make your choice!`;
+                    
+                    // Hide the choice buttons and show new ones for player 2
+                    document.getElementById('choiceButtons').innerHTML = `
+                        <button class="choice-btn" onclick="makeChoice2('rock')">🪨</button>
+                        <button class="choice-btn" onclick="makeChoice2('paper')">📄</button>
+                        <button class="choice-btn" onclick="makeChoice2('scissors')">✂️</button>
+                    `;
+                }
+            }
+        }
+
+        function makeChoice2(choice) {
+            if (waitingForPlayer2) {
+                player2Choice = choice;
+                showChoices();
+                setTimeout(() => {
+                    determineWinner();
+                }, 1000);
+            }
+        }
+
+        function getComputerChoice() {
+            const choices = ['rock', 'paper', 'scissors'];
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+
+        function showChoices() {
+            document.getElementById('resultDisplay').innerHTML = '<span class="countdown">3</span>';
+            
+            setTimeout(() => {
+                document.getElementById('resultDisplay').innerHTML = '<span class="countdown">2</span>';
+            }, 300);
+            
+            setTimeout(() => {
+                document.getElementById('resultDisplay').innerHTML = '<span class="countdown">1</span>';
+            }, 600);
+            
+            setTimeout(() => {
+                document.getElementById('player1Choice').textContent = choices[player1Choice];
+                document.getElementById('player2Choice').textContent = choices[player2Choice];
+            }, 900);
+        }
+
+        function determineWinner() {
+            let result = '';
+            let winner = '';
+            
+            if (player1Choice === player2Choice) {
+                result = "It's a tie!";
+                winner = 'tie';
+            } else if (
+                (player1Choice === 'rock' && player2Choice === 'scissors') ||
+                (player1Choice === 'paper' && player2Choice === 'rock') ||
+                (player1Choice === 'scissors' && player2Choice === 'paper')
+            ) {
+                result = `${player1Name} wins this round!`;
+                winner = 'player1';
+                player1Score++;
+            } else {
+                result = `${player2Name} wins this round!`;
+                winner = 'player2';
+                player2Score++;
+            }
+            
+            // Add visual effects
+            const player1Display = document.getElementById('player1Choice');
+            const player2Display = document.getElementById('player2Choice');
+            
+            if (winner === 'player1') {
+                player1Display.classList.add('winning');
+                player2Display.classList.add('losing');
+            } else if (winner === 'player2') {
+                player2Display.classList.add('winning');
+                player1Display.classList.add('losing');
+            }
+            
+            document.getElementById('resultDisplay').textContent = result;
+            document.getElementById('player1Score').textContent = player1Score;
+            document.getElementById('player2Score').textContent = player2Score;
+            
+            setTimeout(() => {
+                if (player1Score >= 3 || player2Score >= 3) {
+                    endGame();
+                } else {
+                    nextRound();
+                }
+            }, 2000);
+        }
+
+        function nextRound() {
+            currentRound++;
+            document.getElementById('currentRound').textContent = currentRound;
+            resetRound();
+        }
+
+        function resetRound() {
+            waitingForPlayer2 = false;
+            player1Choice = '';
+            player2Choice = '';
+            
+            document.getElementById('player1Choice').textContent = '❓';
+            document.getElementById('player2Choice').textContent = '❓';
+            document.getElementById('player1Choice').classList.remove('winning', 'losing');
+            document.getElementById('player2Choice').classList.remove('winning', 'losing');
+            document.getElementById('resultDisplay').textContent = 'Make your choice!';
+            
+            // Reset choice buttons
+            document.getElementById('choiceButtons').innerHTML = `
+                <button class="choice-btn" onclick="makeChoice('rock')">🪨</button>
+                <button class="choice-btn" onclick="makeChoice('paper')">📄</button>
+                <button class="choice-btn" onclick="makeChoice('scissors')">✂️</button>
+            `;
+        }
+
+        function endGame() {
+            const finalResult = document.getElementById('finalResult');
+            const finalWinner = document.getElementById('finalWinner');
+            const finalScore = document.getElementById('finalScore');
+            
+            if (player1Score > player2Score) {
+                finalWinner.textContent = `🎉 ${player1Name} Wins the Tournament! 🎉`;
+                finalResult.style.background = 'linear-gradient(45deg, #4caf50, #8bc34a)';
+            } else {
+                finalWinner.textContent = `🎉 ${player2Name} Wins the Tournament! 🎉`;
+                finalResult.style.background = 'linear-gradient(45deg, #ff9800, #ffc107)';
+            }
+            
+            finalScore.textContent = `Final Score: ${player1Name} ${player1Score} - ${player2Score} ${player2Name}`;
+            finalResult.classList.remove('hidden');
+            
+            document.getElementById('choiceButtons').style.display = 'none';
+        }
+
+        function resetGame() {
+            currentRound = 1;
+            player1Score = 0;
+            player2Score = 0;
+            
+            document.getElementById('currentRound').textContent = currentRound;
+            document.getElementById('player1Score').textContent = player1Score;
+            document.getElementById('player2Score').textContent = player2Score;
+            document.getElementById('finalResult').classList.add('hidden');
+            document.getElementById('choiceButtons').style.display = 'flex';
+            
+            // Reset labels
+            document.getElementById('player1Label').textContent = 'Player 1';
+            document.getElementById('player2Label').textContent = 'Computer';
+            document.getElementById('player1Name').textContent = 'Player 1';
+            document.getElementById('player2Name').textContent = 'Computer';
+            
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('modeSelection').style.display = 'block';
+            
+            resetRound();
+        }
+    </script>
+</body>
+</html>
